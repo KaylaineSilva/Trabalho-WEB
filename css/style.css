@@ -1,0 +1,37 @@
+body {
+    background-color: #e6d1c6
+}
+
+.btn_azul {
+    border-color: #172d78;
+    color: #172d78;
+}
+
+.btn_azul:hover {
+    background-color: #172d78;
+    color: #fff;;
+    border-color: #172d78;
+}
+
+.btn_bege {
+    border-color: #efc9b6;
+    background-color: #efc9b6;
+    color: #fff;
+}
+
+.btn_bege:hover {
+    color: #efc9b6;
+    border-color: #efc9b6;
+}
+
+.active_azul {
+    color: #172d78;
+}
+
+.nav_link_azul .active_azul:hover{
+    color: #172d78;
+}
+
+.nav_link_azul .outros:hover {
+  color: #efc9b6;       
+}
