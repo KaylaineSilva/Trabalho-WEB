@@ -14,14 +14,14 @@ body {
 }
 
 .btn_bege {
-    border-color: #efc9b6;
-    background-color: #efc9b6;
+    border-color: #a88e81;
+    background-color: #a88e81;
     color: #fff;
 }
 
 .btn_bege:hover {
-    color: #efc9b6;
-    border-color: #efc9b6;
+    color: #a88e81;
+    border-color: #a88e81;
 }
 
 .active_azul {
@@ -33,5 +33,5 @@ body {
 }
 
 .nav_link_azul .outros:hover {
-  color: #efc9b6;       
+  color: #a88e81;       
 }

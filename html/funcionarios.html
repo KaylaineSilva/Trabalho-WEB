@@ -27,10 +27,10 @@
                 <div class="collapse navbar-collapse justify-content-center" id="navbarLinks">
                     <ul class="navbar-nav mx-auto mb-2 mb-lg-0 nav_link_azul">
                         <li class="nav-item">
-                            <a class="nav-link active_azul" aria-current="page" href="home.html">Obras</a>
+                            <a class="nav-link outros" aria-current="page" href="home.html">Obras</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link outros" href="funcionarios.html">Funcionários</a>
+                            <a class="nav-link active_azul" href="funcionarios.html">Funcionários</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link outros" href="presenca.html">Presença</a>
@@ -52,31 +52,30 @@
         <div class="container mt-4">
             <div class="row mt-4">
                 <div class="col">
-                    <h2 class="mb-3">Obras</h2>
+                    <h2 class="mb-3">Funcionários</h2>
                 </div>
                 <div class="col text-end">
                     <select class="form-select w-auto d-inline-block">
                         <option selected>Filtrar por Status</option>
-                        <option value="1">Não inciadas</option>
-                        <option value="2">Em andamento</option>
-                        <option value="3">Concluídas</option>
+                        <option value="1">Ativos</option>
+                        <option value="2">Inativos</option>
                     </select>
                 </div>
             </div>
             
 
             <!-- Botão que abre o modal -->
-            <button class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalObra">
-                Inserir Obra
+            <button class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalFuncionario">
+                Inserir funcionário
             </button>
 
             <!-- Mensagem se não houver obras -->
             <div class="alert alert-light border d-none" role="alert">
-                Nenhuma obra cadastrado.
+                Nenhum funcionário cadastrado.
             </div>
 
             <!--Tabela de obras-->
-            <!-- Três obras por linha-->
+            <!-- Três funcionários por linha-->
             <!--No máximo três linhas -->
             <div class="container mt-4 d-flex justify-content-center">
                 <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -84,33 +83,27 @@
                     <div class="col">
                         <div class="card h-100">
                             <div class="card-body shadow-lg">
-                                <h5 class="card-title">Nome da Obra</h5>
-                                <p class="card-text"><strong>Local:</strong> Endereço da Obra</p>
-                                <p class="card-text"><strong>Cliente:</strong> Nome do Cliente  | Contato do Cliente</p>  
-                                <p> <strong>Status:</strong> Status da obra</p>  
-                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesObra">Ver Detalhes</a>
+                                <h5 class="card-title">Nome do funcionário</h5>
+                                <p> <strong>Status:</strong> Status do funcionário</p>  
+                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesFuncionarios">Ver Detalhes</a>
                             </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="card h-100">
                             <div class="card-body shadow-lg">
-                                <h5 class="card-title">Nome da Obra</h5>
-                                <p class="card-text"><strong>Local:</strong> Endereço da Obra</p>
-                                <p class="card-text"><strong>Cliente:</strong> Nome do Cliente  | Contato do Cliente</p>    
-                                <p> <strong>Status:</strong> Status da obra</p>  
-                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesObra">Ver Detalhes</a>
+                                <h5 class="card-title">Nome do funcionário</h5>
+                                <p> <strong>Status:</strong> Status do funcionário</p>  
+                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesFuncionarios">Ver Detalhes</a>
                             </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="card h-100">
                             <div class="card-body shadow-lg">
-                                <h5 class="card-title">Nome da Obra</h5>
-                                <p class="card-text"><strong>Local:</strong> Endereço da Obra</p>
-                                <p class="card-text"><strong>Cliente:</strong> Nome do Cliente  | Contato do Cliente</p> 
-                                <p> <strong>Status:</strong> Status da obra</p>     
-                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesObra">Ver Detalhes</a>
+                                <h5 class="card-title">Nome do funcionário</h5>
+                                <p> <strong>Status:</strong> Status do funcionário</p>  
+                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesFuncionarios">Ver Detalhes</a>
                             </div>
                         </div>
                     </div>
@@ -120,78 +113,68 @@
         </div>
 
         <!-- Modal - Inserir Obra -->
-        <div class="modal fade" id="modalObra" tabindex="-1" aria-labelledby="modalObraLabel" aria-hidden="true">
+        <div class="modal fade" id="modalFuncionario" tabindex="-1" aria-labelledby="modalFuncionarioLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg"> 
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalObraLabel">Cadastrar Obra</h5>
+                        <h5 class="modal-title" id="modalFuncionarioLabel">Cadastrar Obra</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
                     <div class="modal-body">
                         <form method="POST">
                             <div class="mb-3">
-                                <label class="form-label">Nome da Obra</label>
+                                <label class="form-label">Nome do funcionário</label>
                                 <input type="text" name="nome" class="form-control" required>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Local</label>
-                                <input type="text" name="local" class="form-control">
+                                <label class="form-label">Sobrenome do funcionário</label>
+                                <input type="text" name="nome" class="form-control" required>
                             </div>
 
-                            <h5>Cliente</h5>
                             <div class="mb-3">
-                                <label class="form-label">Nome</label>
-                                <input type="text" name="cliente_nome" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Contato</label>
-                                <input type="text" name="cliente_contato" class="form-control">
+                                <label class="form-label">Endereço</label>
+                                <input type="text" name="local" class="form-control">
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn_azul">Salvar Obra</button>
+                        <button type="submit" class="btn btn_azul">Salvar Funcionário</button>
                     </div>
                 </div>
             </div>
         </div>
         
         <!-- Modal - Detalhes de uma obra-->
-        <div class="modal fade" id="modalDetalhesObra" tabindex="-1" aria-labelledby="modalDetalhesObraLabel" aria-hidden="true">
+        <div class="modal fade" id="modalDetalhesFuncionarios" tabindex="-1" aria-labelledby="modalDetalhesFuncionariosLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg"> 
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalDetalhesObraLabel">Nome da Obra</h5>
+                        <h5 class="modal-title" id="modalDetalhesFuncionariosLabel">Nome da Obra</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
                     <div class="modal-body">
                         <form method="POST">
                             <div class="mb-3">
-                                <label class="form-label">Nome da Obra</label>
+                                <label class="form-label">Nome do funcionário</label>
                                 <input type="text" name="nome" class="form-control" aria-readonly="true" required>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Local</label>
-                                <input type="text" name="local" class="form-control" aria-readonly="true" required>
+                                <label class="form-label">Sobrenome do funcionário</label>
+                                <input type="text" name="nome" class="form-control" required>
                             </div>
 
-                            <h5>Cliente</h5>
                             <div class="mb-3">
-                                <label class="form-label">Nome</label>
-                                <input type="text" name="cliente_nome" class="form-control" aria-readonly="true" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Contato</label>
-                                <input type="text" name="cliente_contato" class="form-control" aria-readonly="true" required>
+                                <label class="form-label">Endereço</label>
+                                <input type="text" name="local" class="form-control">
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn_azul">Editar Obra</button>
+                        <button type="submit" class="btn btn_azul">Editar Funcionário</button>
                     </div>
                 </div>
             </div>
