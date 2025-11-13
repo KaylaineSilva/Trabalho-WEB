@@ -1,0 +1,27 @@
+{
+  "name": "ans",
+  "version": "1.0.0",
+  "description": "O objetivo deste projeto é desenvolver um sistema de gestão para obras e reformas, com o intuito de oferecer à empresa ANS – Construções & Reformas uma ferramenta integrada e eficiente para acompanhar suas atividades. O sistema centralizará as informações de cada obra, permitindo o cadastro e gerenciamento de etapas, clientes e funcionários, além do controle de prazos, status e pagamentos.",
+  "homepage": "https://github.com/KaylaineSilva/Trabalho-WEB#readme",
+  "bugs": {
+    "url": "https://github.com/KaylaineSilva/Trabalho-WEB/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KaylaineSilva/Trabalho-WEB.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "sequelize": "^6.37.7"
+  }
+}
