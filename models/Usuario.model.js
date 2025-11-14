@@ -10,7 +10,6 @@ Usuario.init(
     },
     {
         sequelize,
-        modelName: 'Usuario',
         tableName: 'Usuario',
         timestamps: false,
     }
