@@ -14,7 +14,9 @@ const sequelize = new Sequelize(
     dialectOptions: {
       ssl: { require: true, rejectUnauthorized: false },
     },
-  }
+    logging: false, //retira os logs que aparecem toda vez que o servidor é reiniciado
+  }, 
+    
 );
 
 export default sequelize;
