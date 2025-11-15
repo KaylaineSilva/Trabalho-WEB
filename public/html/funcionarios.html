@@ -73,7 +73,21 @@
                 Nenhum funcionário cadastrado.
             </div>
 
-            <!--Tabela de obras-->
+            <!--Modal de alerta-->
+            <div class="modal fade" id="alertaModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-dark text-light border border-secondary">
+                        <div class="modal-header border-secondary">
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="mensagem_alerta"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Tabela de funcionários-->
             <!-- Três funcionários por linha-->
             <!--No máximo três linhas -->
             <div class="container mt-4 d-flex justify-content-center">
@@ -128,7 +142,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Sobrenome do funcionário</label>
-                                <input type="text" name="nome" class="form-control" id="SobrenomeFuncionario" required>
+                                <input type="text" name="nome" class="form-control" id="sobrenomeFuncionario" required>
                             </div>
 
                             <div class="mb-3">
