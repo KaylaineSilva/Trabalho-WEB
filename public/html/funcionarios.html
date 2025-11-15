@@ -40,9 +40,9 @@
                     </ul>
 
                     <!-- Barra de pesquisa -->
-                    <form class="d-flex ms-auto mb-0" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
-                        <button class="btn btn_azul" type="submit">Buscar</button>
+                    <form class="d-flex ms-auto mb-0" role="search" id="formBusca">
+                        <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar" id="buscaFuncionario">
+                        <button class="btn btn_azul" type="submit" id="btnBusca">Buscar</button>
                     </form>
             </div>
         </nav>
@@ -54,7 +54,7 @@
                     <h2 class="mb-3">Funcionários</h2>
                 </div>
                 <div class="col text-end">
-                    <select class="form-select w-auto d-inline-block">
+                    <select class="form-select w-auto d-inline-block" id="filtroStatus">
                         <option selected>Filtrar por Status</option>
                         <option value="1">Ativos</option>
                         <option value="2">Inativos</option>
@@ -67,11 +67,6 @@
             <button class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalFuncionario">
                 Inserir funcionário
             </button>
-
-            <!-- Mensagem se não houver obras -->
-            <div class="alert alert-light border d-none" role="alert">
-                Nenhum funcionário cadastrado.
-            </div>
 
             <!--Modal de alerta-->
             <div class="modal fade" id="alertaModal" tabindex="-1" aria-hidden="true">
@@ -90,150 +85,132 @@
             <!--Tabela de funcionários-->
             <!-- Três funcionários por linha-->
             <!--No máximo três linhas -->
-            <div class="container mt-4 d-flex justify-content-center">
-                <div class="row row-cols-1 row-cols-md-3 g-4">
-                    <!-- Exemplo de obra -->
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-body shadow-lg">
-                                <h5 class="card-title">Nome do funcionário</h5>
-                                <p> <strong>Status:</strong> Status do funcionário</p>  
-                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesFuncionarios">Ver Detalhes</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-body shadow-lg">
-                                <h5 class="card-title">Nome do funcionário</h5>
-                                <p> <strong>Status:</strong> Status do funcionário</p>  
-                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesFuncionarios">Ver Detalhes</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-body shadow-lg">
-                                <h5 class="card-title">Nome do funcionário</h5>
-                                <p> <strong>Status:</strong> Status do funcionário</p>  
-                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesFuncionarios">Ver Detalhes</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>    
-
+            <div class="container mt-4">
+                <div id="lista-funcionarios" class="row row-cols-1 row-cols-md-3 g-4">
+                    <!-- JS vai injetar os cards aqui -->
+                </div>
             </div>
-        </div>
 
-        <!-- Modal - Inserir Funcionário -->
-        <div class="modal fade" id="modalFuncionario" tabindex="-1" aria-labelledby="modalFuncionarioLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg"> 
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalFuncionarioLabel">Cadastrar Funcionário</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="formFuncionario">
-                            <div class="mb-3">
-                                <label class="form-label">Nome do funcionário</label>
-                                <input type="text" name="nome" class="form-control" id="nomeFuncionario" required>
-                            </div>
+            <!-- Paginação -->
+            <div class="d-flex justify-content-center mt-3">
+                <ul id="paginacao-funcionarios" class="pagination"></ul>
+            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Sobrenome do funcionário</label>
-                                <input type="text" name="nome" class="form-control" id="sobrenomeFuncionario" required>
-                            </div>
+            <!-- Alerta de vazio -->
+            <div id="alertaVazioFuncionarios" class="alert alert-light border d-none mt-3" role="alert">
+                Nenhum funcionário cadastrado.
+            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Endereço</label>
-                                <input type="text" name="local" class="form-control" id="enderecoFuncionario" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Salário Diário</label>
-                                <input type="number" name="salarioDia" id="salarioDiaFuncionario" class="form-control" step="0.01" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" name="status" id="statusFuncionario" required>
-                                    <option value="" disabled selected>Selecione o status</option>
-                                    <option value="ativo">Ativo</option>
-                                    <option value="inativo">Inativo</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Cargo</label>
-                                <select class="form-select" name="cargo" id="cargoFuncionario" required>
-                                    <option value="" disabled selected>Selecione o cargo</option>
-                                    <option value="pedreiro">Pedreiro</option>
-                                    <option value="ajudante">Ajudante</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Forma de Pagamento</label>
-                                <select class="form-select" name="formaPagamento" id="formaPagamentoFuncionario" required>
-                                    <option value="" disabled selected>Selecione a forma de pagamento</option>
-                                    <option value="pix">Pix</option>
-                                    <option value="dinheiro">Dinheiro</option>
-                                    <option value="transferencia">Transferência</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <div id="divPix" class="d-none">
-                                    <label class="form-label">Chave Pix</label>
-                                    <input type="text" name="chavePix" id="chavePix" class="form-control"/>
+            <!-- Modal - Inserir Funcionário -->
+            <div class="modal fade" id="modalFuncionario" tabindex="-1" aria-labelledby="modalFuncionarioLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg"> 
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalFuncionarioLabel">Cadastrar Funcionário</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formFuncionario">
+                                <div class="mb-3">
+                                    <label class="form-label">Nome do funcionário</label>
+                                    <input type="text" name="nome" class="form-control" id="nomeFuncionario" required>
                                 </div>
-                                <div id="divConta" class="d-none">
-                                    <label class="form-label">Agência</label>
-                                    <input type="text" name="agencia" id="agencia" class="form-control"/>
-                                    <label class="form-label">Número da Conta</label>
-                                    <input type="text" name="numeroConta" id="numeroConta" class="form-control"/>   
+
+                                <div class="mb-3">
+                                    <label class="form-label">Sobrenome do funcionário</label>
+                                    <input type="text" name="nome" class="form-control" id="sobrenomeFuncionario" required>
                                 </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn_azul" id="addFuncionario">Salvar Funcionário</button>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Endereço</label>
+                                    <input type="text" name="local" class="form-control" id="enderecoFuncionario" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Salário Diário</label>
+                                    <input type="number" name="salarioDia" id="salarioDiaFuncionario" class="form-control" step="0.01" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" name="status" id="statusFuncionario" required>
+                                        <option value="" disabled selected>Selecione o status</option>
+                                        <option value="ativo">Ativo</option>
+                                        <option value="inativo">Inativo</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Cargo</label>
+                                    <select class="form-select" name="cargo" id="cargoFuncionario" required>
+                                        <option value="" disabled selected>Selecione o cargo</option>
+                                        <option value="pedreiro">Pedreiro</option>
+                                        <option value="ajudante">Ajudante</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Forma de Pagamento</label>
+                                    <select class="form-select" name="formaPagamento" id="formaPagamentoFuncionario" required>
+                                        <option value="" disabled selected>Selecione a forma de pagamento</option>
+                                        <option value="pix">Pix</option>
+                                        <option value="dinheiro">Dinheiro</option>
+                                        <option value="transferencia bancaria">Transferência Bancária</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div id="divPix" class="d-none">
+                                        <label class="form-label">Chave Pix</label>
+                                        <input type="text" name="chavePix" id="chavePix" class="form-control"/>
+                                    </div>
+                                    <div id="divConta" class="d-none">
+                                        <label class="form-label">Agência</label>
+                                        <input type="text" name="agencia" id="agencia" class="form-control"/>
+                                        <label class="form-label">Número da Conta</label>
+                                        <input type="text" name="numeroConta" id="numeroConta" class="form-control"/>   
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn_azul" id="addFuncionario">Salvar Funcionário</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         
-        <!-- Modal - Detalhes de um funcionário-->
-        <div class="modal fade" id="modalDetalhesFuncionarios" tabindex="-1" aria-labelledby="modalDetalhesFuncionariosLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg"> 
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalDetalhesFuncionariosLabel">Nome da Obra</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="POST">
-                            <div class="mb-3">
-                                <label class="form-label">Nome do funcionário</label>
-                                <input type="text" name="nome" class="form-control" aria-readonly="true" required>
-                            </div>
+            <!-- Modal - Detalhes de um funcionário-->
+            <div class="modal fade" id="modalDetalhesFuncionarios" tabindex="-1" aria-labelledby="modalDetalhesFuncionariosLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg"> 
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalDetalhesFuncionariosLabel">Nome da Obra</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST">
+                                <div class="mb-3">
+                                    <label class="form-label">Nome do funcionário</label>
+                                    <input type="text" name="nome" class="form-control" aria-readonly="true" required>
+                                </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Sobrenome do funcionário</label>
-                                <input type="text" name="nome" class="form-control" required>
-                            </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Sobrenome do funcionário</label>
+                                    <input type="text" name="nome" class="form-control" required>
+                                </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Endereço</label>
-                                <input type="text" name="local" class="form-control">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn_azul">Editar Funcionário</button>
+                                <div class="mb-3">
+                                    <label class="form-label">Endereço</label>
+                                    <input type="text" name="local" class="form-control">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn_azul">Editar Funcionário</button>
+                        </div>
                     </div>
                 </div>
             </div>

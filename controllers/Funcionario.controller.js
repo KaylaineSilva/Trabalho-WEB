@@ -26,3 +26,13 @@ export async function addFuncionario(request, response) {
         return response.json({ deuCerto: false });
     }
 } 
+
+export async function getAllFuncionarios(request, response) {
+    console.log("Entrando aqui");
+
+    const funcionarios = await Funcionarios.findAll({order: [['nome', 'ASC']]});
+
+    if(funcionarios.length==0) response.json({deuCerto: true, vazio: true});
+
+    response.json({deuCerto: true, funcionarios});
+}
