@@ -18,6 +18,34 @@ seletorFormaPagamento.addEventListener("change", () => {
     } else if(formaPagamentoSelecionada == "transferencia bancaria"){
         divPix.classList.add("d-none");
         divConta.classList.remove("d-none");
+    } else {
+        divPix.classList.add("d-none");
+        divConta.classList.add("d-none");
+    }
+
+});
+
+//Esconder os campos do forms de alteração 
+const divPixAlt = document.getElementById("divPixAlt");
+const divContaAlt = document.getElementById("divContaAlt");
+
+divPixAlt.classList.add("d-none");
+divContaAlt.classList.add("d-none");
+
+const seletorFormaPagamentoAlt = document.getElementById("formaPagamentoAltFuncionario");
+
+seletorFormaPagamentoAlt.addEventListener("change", () => {
+    const formaPagamentoSelecionadaAlt = seletorFormaPagamentoAlt.value;
+
+    if(formaPagamentoSelecionadaAlt == "pix") {
+        divContaAlt.classList.add("d-none");
+        divPixAlt.classList.remove("d-none");
+    } else if(formaPagamentoSelecionadaAlt == "transferencia bancaria"){
+        divPixAlt.classList.add("d-none");
+        divContaAlt.classList.remove("d-none");
+    } else {
+        divPixAlt.classList.add("d-none");
+        divContaAlt.classList.add("d-none");
     }
 
 });
@@ -40,6 +68,8 @@ document.getElementById("addFuncionario").addEventListener("click", async (e) =>
     const status = document.getElementById("statusFuncionario").value;
     const formaPagamento = document.getElementById("formaPagamentoFuncionario").value;
     let campoPix, campoAgencia, campoConta;
+
+    //console.log(formaPagamento)
     
     if(!nome || !sobrenome || !endereco || !salarioDia || !cargo || !status || !formaPagamento) {
         document.getElementById("mensagem_alerta").textContent = "Por favor, preencha todos os campos corretamente.";
@@ -62,6 +92,10 @@ document.getElementById("addFuncionario").addEventListener("click", async (e) =>
         campoAgencia = document.getElementById("agencia").value;
         campoConta = document.getElementById("numeroConta").value;
 
+        console.log("Entrando no if transferencia bancária")
+        console.log(campoAgencia);
+        console.log(campoConta);
+
         if(!campoAgencia || !campoConta) {
             document.getElementById("mensagem_alerta").textContent = "Por favor, preencha todos os campos corretamente.";
             alertaAdicionar.show();
@@ -81,7 +115,8 @@ document.getElementById("addFuncionario").addEventListener("click", async (e) =>
     console.log(formaPagamento);
     console.log(campoPix);
     console.log(campoAgencia);
-    console.log(campoConta);*/
+    console.log(campoConta);
+    */
 
     try {
         const {data} = await axios.post('/admin/funcionario/add', 
@@ -139,6 +174,7 @@ let termosBusca = "";
 const selectFiltro = document.getElementById("filtroStatus");
 const formBusca = document.getElementById("formBusca");
 const inputBusca = document.getElementById("buscaFuncionario");
+const alertaVazio = document.getElementById("alertaVazioFuncionarios");
 
 //Filtro de status
 selectFiltro.addEventListener("change", (e) => {
@@ -161,14 +197,14 @@ selectFiltro.addEventListener("change", (e) => {
 //Busca
 formBusca.addEventListener("submit", (e) => {
     e.preventDefault();
-    termoBusca = inputBusca.value.trim().toLowerCase();
+    termosBusca = inputBusca.value.trim().toLowerCase()
+
     pagAtual = 1;
     aplicarFiltroPaginar();
 });
 
 
 async function carregarFuncionarios(){
-    const alertaVazio = document.getElementById("alertaVazioFuncionarios");
     alertaVazio.classList.add("d-none");
 
     try {
@@ -184,6 +220,7 @@ async function carregarFuncionarios(){
         
         if(data.deuCerto){
             if(data.vazio) {
+                alertaVazio.innerText="Nenhum funcionário cadastrado.";
                 alertaVazio.classList.remove("d-none");
             }
 
@@ -216,7 +253,7 @@ function aplicarFiltroPaginar() {
         lista = lista.filter((f) => {
             const nomeCompleto = `${f.nome ?? ""} ${f.sobrenome ?? ""}`.toLowerCase().trim(); //montando a string de nome completo do funcionário 
 
-            return nomeCompleto.includes(termoBusca); //retorna true se o funcionário o nome completo do funcionário bate com o termo de busca
+            return nomeCompleto.includes(termosBusca); //retorna true se o funcionário o nome completo do funcionário bate com o termo de busca
             //Se retornar true, o funcionário fica na lista, caso contrário ele é removido (função filter)
         });
     }
@@ -236,6 +273,15 @@ function aplicarFiltroPaginar() {
 function renderizarFuncionarios(lista) {
     const container = document.getElementById("lista-funcionarios");
 
+    alertaVazio.classList.add("d-none");
+
+    if(lista.length == 0) {
+        container.innerHTML = "";
+        alertaVazio.innerText = "Nenhum funcionário encontrado.";
+        alertaVazio.classList.remove("d-none");
+        return;
+    }
+    
     const htmlCards = lista.map((f) => {
         const nomeCompleto = `${f.nome ?? ""} ${f.sobrenome ?? ""}`.trim();
         let statusLabel = f.status || "-";
@@ -270,10 +316,12 @@ function renderizarFuncionarios(lista) {
             const funcionario = funcionarios.find((f) => f.idFuncionario === id);
             if (!funcionario) return;
 
+            preencherModal(funcionario);
+
             console.log("Abrindo detalhes de:", funcionario);
-            // preencher o modal
+            
         }
-    });
+    });  
 }
 
 // Monta a paginação (<< 1 2 3 >>)
@@ -325,6 +373,153 @@ function renderizarPaginacao(totalPag) {
     });
 }
 
-
-
 carregarFuncionarios();
+
+function preencherModal(funcionario){
+    document.getElementById("nomeAltFuncionario").value = funcionario.nome;
+    document.getElementById("sobrenomeAltFuncionario").value = funcionario.sobrenome;
+    document.getElementById("enderecoAltFuncionario").value = funcionario.endereco;
+    document.getElementById("salarioDiaAltFuncionario").value = funcionario.salarioDia;
+    document.getElementById("cargoAltFuncionario").value = funcionario.cargo; 
+    document.getElementById("statusAltFuncionario").value = funcionario.status;
+    document.getElementById("formaPagamentoAltFuncionario").value = funcionario.formaPagamento;
+
+    document.getElementById("idFuncionario").value = funcionario.idFuncionario;
+    let campoPix, campoAgencia, campoConta;
+
+    if (funcionario.formaPagamento == "pix"){
+        document.getElementById("chavePixAlt").value = funcionario.campoPix;
+        document.getElementById("agenciaAlt").value = null;
+        document.getElementById("numeroContaAlt").value = null;
+
+
+        document.getElementById("divPixAlt").classList.remove("d-none");
+
+        document.getElementById("divContaAlt").classList.add("d-none");
+        
+    } else if(funcionario.formaPagamento == "transferencia bancaria"){
+        document.getElementById("divPixAlt").classList.add("d-none");
+
+        document.getElementById("agenciaAlt").value = funcionario.campoAgencia;
+        document.getElementById("numeroContaAlt").value = funcionario.campoConta;
+        document.getElementById("chavePixAlt").value = null;
+
+        document.getElementById("divContaAlt").classList.remove("d-none");
+
+    } else {
+        document.getElementById("divPixAlt").classList.add("d-none");
+        document.getElementById("divContaAlt").classList.add("d-none");
+
+        document.getElementById("chavePixAlt").value = null;
+        document.getElementById("agenciaAlt").value = null;
+        document.getElementById("numeroContaAlt").value = null;
+    }
+}
+
+/*Adicionando o evento de submissão das alterações do funcionário */
+document.getElementById("editarFuncionario").addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem("authToken");
+
+    const alertaEditar = new bootstrap.Modal(document.getElementById("alertaModal"));
+    const formEditarFuncionario = document.getElementById("formEditarFuncionario");
+
+    const id = document.getElementById("idFuncionario").value;
+    const nome = document.getElementById("nomeAltFuncionario").value;
+    const sobrenome = document.getElementById("sobrenomeAltFuncionario").value;
+    const endereco = document.getElementById("enderecoAltFuncionario").value;
+    const salarioDia = parseFloat(document.getElementById("salarioDiaAltFuncionario").value);
+    const cargo = document.getElementById("cargoAltFuncionario").value; 
+    const status = document.getElementById("statusAltFuncionario").value;
+    const formaPagamento = document.getElementById("formaPagamentoAltFuncionario").value;
+    let campoPix, campoAgencia, campoConta;
+    
+    if(!nome || !sobrenome || !endereco || !salarioDia || !cargo || !status || !formaPagamento) {
+        document.getElementById("mensagem_alerta").textContent = "Por favor, preencha todos os campos corretamente.";
+        alertaEditar.show();
+        return;
+    }
+
+    if (formaPagamento == "pix"){
+        campoPix = document.getElementById("chavePixAlt").value;
+        campoAgencia = null;
+        campoConta =  null;
+
+        if(!campoPix) {
+            document.getElementById("mensagem_alerta").textContent = "Por favor, preencha todos os campos corretamente.";
+            alertaEditar.show();
+            console.log("pix")
+            return;
+        }
+    } else if(formaPagamento == "transferencia bancaria"){
+        campoPix = null;
+        campoAgencia = document.getElementById("agenciaAlt").value;
+        campoConta = document.getElementById("numeroContaAlt").value;
+
+        console.log("Entrando no if transferencia bancária")
+        console.log(campoAgencia);
+        console.log(campoConta);
+
+        if(!campoAgencia || !campoConta) {
+            document.getElementById("mensagem_alerta").textContent = "Por favor, preencha todos os campos corretamente.";
+            alertaEditar.show();
+            return;
+        }
+    }
+
+    /*
+    console.log(nome);
+    console.log(sobrenome);
+    console.log(endereco);
+    console.log(salarioDia);
+    console.log(cargo);
+    console.log(status);
+    console.log(formaPagamento);
+    console.log(campoPix);
+    console.log(campoAgencia);
+    console.log(campoConta);
+    */
+   
+    try {
+        const {data} = await axios.post('/admin/funcionarios/alter', 
+                {
+                    id,
+                    nome,
+                    sobrenome,
+                    endereco, 
+                    salarioDia,
+                    cargo,
+                    status,
+                    formaPagamento,
+                    campoPix,
+                    campoAgencia,
+                    campoConta
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+        
+            
+        if (data.deuCerto) {
+            document.getElementById("mensagem_alerta").textContent = "Funcionário modificado com sucesso!";
+            document.getElementById('modalDetalhesFuncionarios').querySelector('.btn-close').click(); //fechando o modal de criação
+            formEditarFuncionario.reset();
+            alertaEditar.show();
+            carregarFuncionarios(); // Recarrega a lista de funcionários
+        } else {
+            document.getElementById("mensagem_alerta").textContent = "Falha ao modificar funcionário. Tente novamente.";
+            alertaEditar.show();
+        }
+    } catch (error) {
+        console.error("Erro ao adicionar funcionário:", error);
+        document.getElementById('modalFuncionario').querySelector('.btn-close').click(); //fechando o modal de criação
+        formEditarFuncionario.reset();
+        document.getElementById("mensagem_alerta").textContent = "Erro ao adicionar funcionário. Tente novamente.";
+        alertaAdicionar.show();
+    }
+    
+});

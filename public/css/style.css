@@ -35,3 +35,13 @@ body {
 .nav_link_azul .outros:hover {
   color: #a88e81;       
 }
+
+/*Fazendo com que o div de alerta se sobreponha a todos os outros*/
+#alertaModal{
+  position: fixed;      
+  top: 20px;            
+  left: 50%;            
+  transform: translateX(-50%);
+  z-index: 20000;        
+  max-width: 600px;     
+}

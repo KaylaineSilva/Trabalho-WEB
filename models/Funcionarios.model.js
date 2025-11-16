@@ -23,8 +23,8 @@ Funcionarios.init(
             allowNull: false 
         },
         campoPix: { type: DataTypes.STRING, allowNull: true },
-        agencia: { type: DataTypes.STRING, allowNull: true },
-        conta: { type: DataTypes.STRING, allowNull: true },
+        campoAgencia: { type: DataTypes.STRING, allowNull: true },
+        campoConta: { type: DataTypes.STRING, allowNull: true },
         idUsuario: {
             type: DataTypes.INTEGER,
             references: {
