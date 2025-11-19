@@ -127,7 +127,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
                     <div class="modal-body">
-                        <form method="POST">
+                        <form id="formCadastroObra">
                             <div class="mb-3">
                                 <label class="form-label">Nome da Obra</label>
                                 <input type="text" name="nome" class="form-control" required>
@@ -135,7 +135,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Local</label>
-                                <input type="text" name="local" class="form-control">
+                                <input type="text" name="local" class="form-control" required>
                             </div>
 
                             <h5>Cliente</h5>
@@ -147,12 +147,77 @@
                                 <label class="form-label">Contato</label>
                                 <input type="text" name="cliente_contato" class="form-control">
                             </div>
+
+                            <hr>
+
+                            <!-- ========= Etapas ========= -->
+                            <h5>Etapas da obra</h5>
+                            <div id="lista-etapas"></div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="btnAddEtapa">
+                                Adicionar etapa
+                            </button>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Quantidade de etapas</label>
+                                    <input type="text" id="qtdEtapasObra" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Valor total da obra</label>
+                                    <input type="text" id="valorTotalObra" class="form-control" readonly>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <!-- ========= Funcionários ========= -->
+                            <h5>Funcionários na obra</h5>
+
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-6">
+                                    <label class="form-label">Funcionário</label>
+                                    <select id="selectFuncionario" class="form-select">
+                                        <option value="">Carregando funcionários...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Salário por dia na obra</label>
+                                    <input type="number" id="funcSalarioDia" class="form-control" min="0" step="0.01">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Cargo</label>
+                                    <select id="funcCargo" class="form-select">
+                                        <option value="ajudante">Ajudante</option>
+                                        <option value="pedreiro">Pedreiro</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAddFuncionarioObra">
+                                        Adicionar funcionário
+                                    </button>
+                                </div>
+                            </div>
+
+                            <table class="table table-sm mt-3" id="tabela-funcionarios-obra">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Salário/dia</th>
+                                        <th>Cargo</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
                         </form>
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn_azul">Salvar Obra</button>
+                        <!-- NÃO envia o form diretamente; vamos tratar via JS -->
+                        <button type="button" class="btn btn_azul" id="btnSalvarObra">Salvar Obra</button>
                     </div>
+
                 </div>
             </div>
         </div>
