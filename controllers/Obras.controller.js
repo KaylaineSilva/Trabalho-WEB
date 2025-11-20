@@ -124,6 +124,7 @@ export async function createObra(req, res) {
         const {
             nome,
             local,
+            statusObra,
             cliente,
             etapas = [],
             funcionarios = [],
@@ -150,14 +151,16 @@ export async function createObra(req, res) {
             ? etapas.reduce((acc, e) => acc + (parseFloat(e.valor) || 0), 0)
             : 0;
 
+        
+        const statusFinal = statusObra || "não iniciada";
         const novaObra = await Obras.create(
             {
                 nome,
                 local,
                 qtdEtapas,
                 valorTotal,
-                status: "não iniciada",
-                idUsuario, // ✅ AGORA NÃO É MAIS NULL
+                status: statusFinal,
+                idUsuario,
             },
             { transaction: t }
         );
@@ -179,21 +182,81 @@ export async function createObra(req, res) {
             { transaction: t }
         );
 
+        // validação das etapas no back-end
+        if (!Array.isArray(etapas)) {
+            await t.rollback();
+            return res.json({
+                deuCerto: false,
+                message: "Formato de etapas inválido.",
+            });
+        }
+
+        const etapasValidas = [];
+        let etapaIncompleta = false;
+
+        for (const [idx, etapa] of etapas.entries()) {
+            const nome = (etapa.nome || "").trim();
+            const descricao = (etapa.descricao || "").trim();
+            const prazo = etapa.prazo;
+            const status = etapa.status;
+            const valorStr = etapa.valor;
+            const valor = parseFloat(valorStr);
+
+            if (!nome) {
+                // sem nome, mas com outros dados -> incompleta
+                if (descricao || prazo || status || valorStr) {
+                    etapaIncompleta = true;
+                }
+                continue; // ignora etapas sem nome
+            }
+
+            // tem nome -> tudo obrigatório
+            if (!descricao || !prazo || !status || valorStr === undefined || valorStr === null || isNaN(valor) || valor <= 0) {
+                etapaIncompleta = true;
+                continue;
+            }
+
+            etapasValidas.push({
+                nome,
+                descricao,
+                prazo,
+                status,
+                valor,
+            });
+        }
+
+        if (etapaIncompleta) {
+            await t.rollback();
+            return res.json({
+                deuCerto: false,
+                message: "Há etapas com nome preenchido, mas com informações faltando. Complete descrição, prazo, status e valor.",
+            });
+        }
+
+        if (etapasValidas.length === 0) {
+            await t.rollback();
+            return res.json({
+                deuCerto: false,
+                message: "Cadastre pelo menos uma etapa completa para a obra.",
+            });
+        }
+
+
         // etapas
-        for (const etapa of etapas) {
-            if (!etapa.nome) continue;
+        for (const etapa of etapasValidas) {
             await Etapas.create(
                 {
                     idObra: novaObra.idObra,
                     nome: etapa.nome,
-                    descricao: etapa.descricao || null,
-                    prazo: etapa.prazo || null,
-                    status: etapa.status || "não iniciada",
-                    valor: parseFloat(etapa.valor) || 0,
+                    descricao: etapa.descricao,
+                    prazo: etapa.prazo,
+                    status: etapa.status,
+                    valor: etapa.valor,
                 },
                 { transaction: t }
             );
         }
+
 
         // funcionários
         for (const f of funcionarios) {

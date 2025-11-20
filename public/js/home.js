@@ -13,6 +13,36 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const modalObraEl = document.getElementById("modalObra");
+    if (modalObraEl) {
+        modalObraEl.addEventListener("show.bs.modal", () => {
+            const form = document.getElementById("formCadastroObra");
+            if (form) {
+                form.reset();
+            }
+
+            // Se você tiver listas dinâmicas de etapas/funcionários, limpe aqui:
+            const listaEtapas = document.getElementById("lista-etapas");
+            if (listaEtapas) {
+                listaEtapas.innerHTML = "";
+                // se quiser começar sempre com uma etapa vazia:
+                if (typeof adicionarEtapa === "function") {
+                    adicionarEtapa();
+                }
+            }
+
+            const tabelaFunc = document.querySelector("#tabela-funcionarios-obra tbody");
+            if (tabelaFunc) {
+                tabelaFunc.innerHTML = "";
+            }
+
+            const qtdEtapas = document.getElementById("qtdEtapasObra");
+            if (qtdEtapas) qtdEtapas.value = "";
+
+            const valorTotal = document.getElementById("valorTotalObra");
+            if (valorTotal) valorTotal.value = "";
+        });
+    }
     inicializarCadastroObra();
 });
 
@@ -310,6 +340,7 @@ async function salvarObra() {
 
     const nome = form.nome.value.trim();
     const local = form.local.value.trim();
+    const statusObra = form.statusObra.value;
     const clienteNome = form.cliente_nome.value.trim();
     const clienteContato = form.cliente_contato.value.trim();
 
@@ -324,21 +355,35 @@ async function salvarObra() {
 
     // monta etapas
     const etapas = [];
+    let etapaIncompleta = false;
+
     document
         .querySelectorAll("#lista-etapas .etapa-item")
         .forEach((item) => {
             const nome = item.querySelector(".etapa-nome").value.trim();
-            const descricao = item
-                .querySelector(".etapa-descricao")
-                .value.trim();
+            const descricao = item.querySelector(".etapa-descricao").value.trim();
             const prazo = item.querySelector(".etapa-prazo").value;
             const status = item.querySelector(".etapa-status").value;
-            const valor = parseFloat(
-                item.querySelector(".etapa-valor").value || "0"
-            );
+            const valorStr = item.querySelector(".etapa-valor").value;
+            const valor = parseFloat(valorStr);
 
-            if (!nome) return; // ignora etapa vazia
+            // 1) Se NÃO tiver nome:
+            if (!nome) {
+                // se não tem nome mas a pessoa começou a digitar algo em outro campo, é etapa “meio preenchida”
+                if (descricao || prazo || status || valorStr) {
+                    etapaIncompleta = true;
+                }
+                // em qualquer caso, etapa sem nome NÃO entra na lista
+                return;
+            }
 
+            // 2) Tem nome → todos os outros campos passam a ser obrigatórios
+            if (!descricao || !prazo || !status || valorStr === "" || isNaN(valor)) {
+                etapaIncompleta = true;
+                return;
+            }
+
+            // 3) Etapa válida (completa)
             etapas.push({
                 nome,
                 descricao,
@@ -347,6 +392,30 @@ async function salvarObra() {
                 valor,
             });
         });
+
+    // Se existe alguma etapa com nome mas faltando coisa:
+    if (etapaIncompleta) {
+        alert("Complete todas as informações das etapas que têm nome (descrição, prazo, status e valor).");
+        return;
+    }
+
+    // Se nenhuma etapa válida foi montada:
+    if (etapas.length === 0) {
+        alert("Cadastre pelo menos uma etapa completa para a obra.");
+        return;
+    }
+
+
+if (etapaIncompleta) {
+    alert("Preencha todas as informações de cada etapa que tiver nome (descrição, prazo, status e valor).");
+    return;
+}
+
+if (etapas.length === 0) {
+    alert("Cadastre pelo menos uma etapa completa para a obra.");
+    return;
+}
+
 
     // monta funcionários na obra
     const funcionarios = [];
@@ -371,6 +440,7 @@ async function salvarObra() {
     const payload = {
         nome,
         local,
+        statusObra,
         cliente: {
             nome: clienteNome,
             contato: clienteContato,

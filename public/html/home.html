@@ -138,6 +138,15 @@
                                 <input type="text" name="local" class="form-control" required>
                             </div>
 
+                            <div class="mb-3">
+                                <label class="form-label">Status da Obra</label>
+                                <select name="statusObra" class="form-select">
+                                    <option value="não iniciada">Não iniciada</option>
+                                    <option value="em andamento">Em andamento</option>
+                                    <option value="concluída">Concluída</option>
+                                </select>
+                            </div>
+
                             <h5>Cliente</h5>
                             <div class="mb-3">
                                 <label class="form-label">Nome</label>
@@ -149,8 +158,6 @@
                             </div>
 
                             <hr>
-
-                            <!-- ========= Etapas ========= -->
                             <h5>Etapas da obra</h5>
                             <div id="lista-etapas"></div>
                             <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="btnAddEtapa">
@@ -169,8 +176,6 @@
                             </div>
 
                             <hr>
-
-                            <!-- ========= Funcionários ========= -->
                             <h5>Funcionários na obra</h5>
 
                             <div class="row g-2 align-items-end">
