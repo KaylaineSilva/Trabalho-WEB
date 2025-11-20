@@ -117,32 +117,79 @@ function renderizarObras(obras) {
 }
 
 // ========== DETALHES DA OBRA ==========
+function formatarPrazo(prazo) {
+    if (!prazo) return "-";
+
+    // se vier no formato ISO (2025-11-20T00:00:00.000Z)
+    if (prazo.includes("T")) {
+        prazo.split("T")[0];
+        const d = new Date(prazo);
+        return d.toLocaleDateString("pt-BR");
+    }
+
+    return prazo; // se já vier só a data
+}
+
 window.abrirDetalhesBack = async function (idObra) {
     const token = localStorage.getItem("authToken");
 
     try {
         const { data } = await axios.get(`/admin/obras/${idObra}`, {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${token}` }
         });
 
         if (!data.deuCerto) return;
 
         const obra = data.obra;
 
+        // Campos principais
         document.getElementById("detalheNomeObra").value = obra.nome;
         document.getElementById("detalheLocalObra").value = obra.local;
         document.getElementById("detalheStatusObra").value = obra.status || "-";
-        document.getElementById("detalheQtdEtapas").value = obra.qtdEtapas;
+        document.getElementById("detalheQtdEtapas").value = obra.qtdEtapas ?? (obra.Etapas?.length || 0);
         document.getElementById("detalheValorObra").value =
-            "R$ " + (obra.valorTotal ?? 0).toFixed(2).replace(".", ",");
+            "R$ " + Number(obra.valorTotal ?? 0).toFixed(2).replace(".", ",");
 
-        const cliente = (obra.Clientes && obra.Clientes[0]) || {};
+        // Cliente
+        const cliente = obra.Clientes?.[0] || {};
         document.getElementById("detalheClienteNome").value = cliente.nome || "-";
         document.getElementById("detalheClienteContato").value = cliente.contato || "-";
+
+        // ====== ETAPAS ======
+        const corpoEtapas = document.querySelector("#tabelaDetalhesEtapas tbody");
+        if (corpoEtapas) {
+            corpoEtapas.innerHTML = "";
+
+            const etapas = obra.Etapas || [];
+            
+
+            if (etapas.length === 0) {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `<td colspan="5" class="text-center">Nenhuma etapa cadastrada.</td>`;
+                corpoEtapas.appendChild(tr);
+            } else {
+                etapas.forEach((etapa) => {
+                    const tr = document.createElement("tr");
+                    const valor = Number(etapa.valor ?? 0);
+                    const prazoFmt = formatarPrazo(etapa.prazo);
+
+                    tr.innerHTML = `
+                        <td>${etapa.nome}</td>
+                        <td>${etapa.descricao || "-"}</td>
+                        <td>${prazoFmt || "-"}</td>
+                        <td>${etapa.status || "-"}</td>
+                        <td>R$ ${valor.toFixed(2).replace(".", ",")}</td>
+                    `;
+                    corpoEtapas.appendChild(tr);
+                });
+            }
+        }
+
     } catch (error) {
         console.error("Erro ao carregar detalhes:", error);
     }
 };
+
 
 // ========== CADASTRO DE OBRA (MODAL) ==========
 
