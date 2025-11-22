@@ -294,3 +294,42 @@ export async function createObra(req, res) {
         });
     }
 }
+
+// =================== BUSCAR OBRAS POR NOME, LOCAL OU CLIENTE ===================
+export async function buscarObras(req, res) {
+    try {
+        const termo = (req.query.termo || "").trim().toLowerCase();
+
+        if (!termo) {
+            return res.json({ deuCerto: true, obras: [] });
+        }
+
+        const obras = await Obras.findAll({
+            include: [
+                {
+                    model: Clientes,
+                    through: { attributes: [] }
+                }
+            ]
+        });
+
+        // Filtro 
+        const filtradas = obras.filter((obra) => {
+            const nomeObra = obra.nome?.toLowerCase() || "";
+            const localObra = obra.local?.toLowerCase() || "";
+            const cliente = obra.Clientes?.[0];
+            const nomeCliente = cliente?.nome?.toLowerCase() || "";
+
+            return (
+                nomeObra.includes(termo) ||
+                localObra.includes(termo) ||
+                nomeCliente.includes(termo)
+            );
+        });
+
+        return res.json({ deuCerto: true, obras: filtradas });
+    } catch (error) {
+        console.error("Erro ao buscar obras:", error);
+        return res.json({ deuCerto: false });
+    }
+}

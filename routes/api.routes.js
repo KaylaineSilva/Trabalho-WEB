@@ -4,7 +4,14 @@ import { autenticarUsuario} from '../controllers/Usuario.controller.js';
 import { verificarToken } from '../controllers/Usuario.controller.js';
 import { logoutUser } from '../controllers/Usuario.controller.js';
 import { addFuncionario, alterFuncionario, getAllFuncionarios } from '../controllers/Funcionario.controller.js';
-import { getAllObras, getObrasPorStatus, getObraPorId, createObra } from '../controllers/Obras.controller.js';
+import { 
+    getAllObras, 
+    getObrasPorStatus, 
+    getObraPorId, 
+    createObra,
+    buscarObras
+} from '../controllers/Obras.controller.js';
+
 
 const router = express.Router();
 
@@ -19,6 +26,9 @@ router.post('/admin/obras/add', verificarToken, createObra);
 
 router.get('/admin/obras', verificarToken, getAllObras);
 router.get('/admin/obras/status/:status', verificarToken, getObrasPorStatus);
+router.get('/admin/obras/buscar', verificarToken, buscarObras);
 router.get('/admin/obras/:id', verificarToken, getObraPorId);
+
+
 
 export default router;

@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (filtro) {
         filtro.addEventListener("change", () => {
             const valor = filtro.value;
+            paginaAtual = 1; // reset paginação
             if (valor === "todas") {
                 carregarObras();
             } else {
@@ -17,24 +18,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modalObraEl) {
         modalObraEl.addEventListener("show.bs.modal", () => {
             const form = document.getElementById("formCadastroObra");
-            if (form) {
-                form.reset();
-            }
+            if (form) form.reset();
 
-            // Se você tiver listas dinâmicas de etapas/funcionários, limpe aqui:
             const listaEtapas = document.getElementById("lista-etapas");
             if (listaEtapas) {
                 listaEtapas.innerHTML = "";
-                // se quiser começar sempre com uma etapa vazia:
-                if (typeof adicionarEtapa === "function") {
-                    adicionarEtapa();
-                }
+                if (typeof adicionarEtapa === "function") adicionarEtapa();
             }
 
             const tabelaFunc = document.querySelector("#tabela-funcionarios-obra tbody");
-            if (tabelaFunc) {
-                tabelaFunc.innerHTML = "";
-            }
+            if (tabelaFunc) tabelaFunc.innerHTML = "";
 
             const qtdEtapas = document.getElementById("qtdEtapasObra");
             if (qtdEtapas) qtdEtapas.value = "";
@@ -43,10 +36,18 @@ document.addEventListener("DOMContentLoaded", () => {
             if (valorTotal) valorTotal.value = "";
         });
     }
+
     inicializarCadastroObra();
 });
 
-// ========== LISTAR / FILTRAR OBRAS ==========
+// ======== CONTROLES DE PAGINAÇÃO  ========
+let obrasPaginadas = [];
+let paginaAtual = 1;
+const itensPorPagina = 6;
+
+
+// ================== LISTAR / FILTRAR ==================
+
 async function carregarObras() {
     const token = localStorage.getItem("authToken");
 
@@ -56,6 +57,7 @@ async function carregarObras() {
         });
 
         if (data.deuCerto) {
+            paginaAtual = 1;
             renderizarObras(data.obras);
         }
     } catch (e) {
@@ -72,6 +74,7 @@ async function filtrarObras(status) {
         });
 
         if (data.deuCerto) {
+            paginaAtual = 1;
             renderizarObras(data.obras);
         }
     } catch (e) {
@@ -79,20 +82,114 @@ async function filtrarObras(status) {
     }
 }
 
+// ================== BUSCA ==================
+
+document.getElementById("formBuscaObras").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const termo = document.getElementById("inputBuscaObras").value.trim();
+    const token = localStorage.getItem("authToken");
+
+    if (!termo) {
+        carregarObras();
+        return;
+    }
+
+    try {
+        const { data } = await axios.get(`/admin/obras/buscar?termo=${encodeURIComponent(termo)}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (data.deuCerto) {
+            paginaAtual = 1;
+            renderizarObras(data.obras);
+        }
+    } catch (err) {
+        console.warn("Erro ao buscar obras:", err);
+    }
+});
+
+// ========================================================
+//  PAGINAÇÃO 
+// ========================================================
+
+function paginar(lista) {
+    const inicio = (paginaAtual - 1) * itensPorPagina;
+    const fim = inicio + itensPorPagina;
+    return lista.slice(inicio, fim);
+}
+
+function atualizarPaginacao() {
+    const totalPaginas = Math.ceil(obrasPaginadas.length / itensPorPagina);
+    const paginacao = document.getElementById("paginacao-obras");
+
+    if (!paginacao) return;
+
+    if (totalPaginas <= 1) {
+        paginacao.innerHTML = "";
+        return;
+    }
+
+    let html = `
+        <div class="pagination-container">
+            <ul class="pagination justify-content-center">
+                <li class="page-item ${paginaAtual === 1 ? "disabled" : ""}">
+                    <a class="page-link" href="#" onclick="mudarPagina(${paginaAtual - 1})">«</a>
+                </li>
+    `;
+
+    for (let i = 1; i <= totalPaginas; i++) {
+        html += `
+            <li class="page-item ${i === paginaAtual ? "active" : ""}">
+                <a class="page-link" href="#" onclick="mudarPagina(${i})">${i}</a>
+            </li>
+        `;
+    }
+
+    html += `
+                <li class="page-item ${paginaAtual === totalPaginas ? "disabled" : ""}">
+                    <a class="page-link" href="#" onclick="mudarPagina(${paginaAtual + 1})">»</a>
+                </li>
+            </ul>
+        </div>
+    `;
+
+    paginacao.innerHTML = html;
+}
+
+
+window.mudarPagina = function (nova) {
+    const totalPaginas = Math.ceil(obrasPaginadas.length / itensPorPagina);
+
+    if (nova < 1 || nova > totalPaginas) return;
+
+    paginaAtual = nova;
+    renderizarObras(obrasPaginadas);
+};
+
+
+// ========================================================
+// RENDERIZAÇÃO 
+// ========================================================
+
 function renderizarObras(obras) {
     const container = document.getElementById("lista-obras");
     if (!container) return;
 
+    obrasPaginadas = obras;
+    const exibicao = paginar(obrasPaginadas);
+
     container.className = "row row-cols-1 row-cols-md-3 g-4";
 
-    if (!obras || obras.length === 0) {
+    if (!exibicao || exibicao.length === 0) {
         container.innerHTML = `
             <p class="text-center mt-3 w-100">Nenhuma obra encontrada.</p>
         `;
+        document.getElementById("paginacao-obras").innerHTML = "";
         return;
     }
 
-    container.innerHTML = obras
+    container.innerHTML = exibicao
         .map(
             (obra) => `
             <div class="col d-flex">
@@ -110,24 +207,25 @@ function renderizarObras(obras) {
                         </button>
                     </div>
                 </div>
-            </div>
-        `
+            </div>`
         )
         .join("");
+
+    atualizarPaginacao();
 }
 
-// ========== DETALHES DA OBRA ==========
+// ========================================================
+//DETALHES DA OBRA 
+// ========================================================
+
 function formatarPrazo(prazo) {
     if (!prazo) return "-";
-
-    // se vier no formato ISO (2025-11-20T00:00:00.000Z)
     if (prazo.includes("T")) {
         prazo.split("T")[0];
         const d = new Date(prazo);
         return d.toLocaleDateString("pt-BR");
     }
-
-    return prazo; // se já vier só a data
+    return prazo;
 }
 
 window.abrirDetalhesBack = async function (idObra) {
@@ -142,47 +240,42 @@ window.abrirDetalhesBack = async function (idObra) {
 
         const obra = data.obra;
 
-        // Campos principais
         document.getElementById("detalheNomeObra").value = obra.nome;
         document.getElementById("detalheLocalObra").value = obra.local;
         document.getElementById("detalheStatusObra").value = obra.status || "-";
-        document.getElementById("detalheQtdEtapas").value = obra.qtdEtapas ?? (obra.Etapas?.length || 0);
+        document.getElementById("detalheQtdEtapas").value =
+            obra.qtdEtapas ?? (obra.Etapas?.length || 0);
         document.getElementById("detalheValorObra").value =
             "R$ " + Number(obra.valorTotal ?? 0).toFixed(2).replace(".", ",");
 
-        // Cliente
         const cliente = obra.Clientes?.[0] || {};
         document.getElementById("detalheClienteNome").value = cliente.nome || "-";
         document.getElementById("detalheClienteContato").value = cliente.contato || "-";
 
-        // ====== ETAPAS ======
         const corpoEtapas = document.querySelector("#tabelaDetalhesEtapas tbody");
-        if (corpoEtapas) {
-            corpoEtapas.innerHTML = "";
+        corpoEtapas.innerHTML = "";
 
-            const etapas = obra.Etapas || [];
-            
+        const etapas = obra.Etapas || [];
 
-            if (etapas.length === 0) {
+        if (etapas.length === 0) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td colspan="5" class="text-center">Nenhuma etapa cadastrada.</td>`;
+            corpoEtapas.appendChild(tr);
+        } else {
+            etapas.forEach((etapa) => {
                 const tr = document.createElement("tr");
-                tr.innerHTML = `<td colspan="5" class="text-center">Nenhuma etapa cadastrada.</td>`;
-                corpoEtapas.appendChild(tr);
-            } else {
-                etapas.forEach((etapa) => {
-                    const tr = document.createElement("tr");
-                    const valor = Number(etapa.valor ?? 0);
-                    const prazoFmt = formatarPrazo(etapa.prazo);
+                const valor = Number(etapa.valor ?? 0);
+                const prazoFmt = formatarPrazo(etapa.prazo);
 
-                    tr.innerHTML = `
-                        <td>${etapa.nome}</td>
-                        <td>${etapa.descricao || "-"}</td>
-                        <td>${prazoFmt || "-"}</td>
-                        <td>${etapa.status || "-"}</td>
-                        <td>R$ ${valor.toFixed(2).replace(".", ",")}</td>
-                    `;
-                    corpoEtapas.appendChild(tr);
-                });
-            }
+                tr.innerHTML = `
+                    <td>${etapa.nome}</td>
+                    <td>${etapa.descricao || "-"}</td>
+                    <td>${prazoFmt || "-"}</td>
+                    <td>${etapa.status || "-"}</td>
+                    <td>R$ ${valor.toFixed(2).replace(".", ",")}</td>
+                `;
+                corpoEtapas.appendChild(tr);
+            });
         }
 
     } catch (error) {
@@ -190,8 +283,9 @@ window.abrirDetalhesBack = async function (idObra) {
     }
 };
 
-
-// ========== CADASTRO DE OBRA (MODAL) ==========
+// ========================================================
+// CADASTRO DE OBRAS 
+// ========================================================
 
 function inicializarCadastroObra() {
     const btnAddEtapa = document.getElementById("btnAddEtapa");
@@ -200,7 +294,6 @@ function inicializarCadastroObra() {
 
     if (btnAddEtapa) {
         btnAddEtapa.addEventListener("click", adicionarEtapa);
-        // começa com pelo menos 1 etapa
         adicionarEtapa();
     }
 
@@ -215,7 +308,7 @@ function inicializarCadastroObra() {
     carregarFuncionariosParaSelect();
 }
 
-// ---------- Etapas ----------
+// --- Etapas ---
 
 function adicionarEtapa() {
     const container = document.getElementById("lista-etapas");
@@ -258,16 +351,12 @@ function adicionarEtapa() {
 
     container.appendChild(wrapper);
 
-    const btnRemover = wrapper.querySelector(".btn-remover-etapa");
-    btnRemover.addEventListener("click", () => {
+    wrapper.querySelector(".btn-remover-etapa").addEventListener("click", () => {
         wrapper.remove();
         recalcularResumoObra();
     });
 
-    // recalcular quando valor mudar
-    wrapper
-        .querySelector(".etapa-valor")
-        .addEventListener("input", recalcularResumoObra);
+    wrapper.querySelector(".etapa-valor").addEventListener("input", recalcularResumoObra);
 
     recalcularResumoObra();
 }
@@ -284,18 +373,15 @@ function recalcularResumoObra() {
         const nome = item.querySelector(".etapa-nome").value.trim();
         const valor = parseFloat(item.querySelector(".etapa-valor").value || "0");
 
-        if (nome) {
-            qtd += 1;
-        }
+        if (nome) qtd++;
         total += isNaN(valor) ? 0 : valor;
     });
 
     if (qtdInput) qtdInput.value = qtd;
-    if (valorInput)
-        valorInput.value = "R$ " + total.toFixed(2).replace(".", ",");
+    if (valorInput) valorInput.value = "R$ " + total.toFixed(2).replace(".", ",");
 }
 
-// ---------- Funcionários na obra ----------
+// --- Funcionários ---
 
 async function carregarFuncionariosParaSelect() {
     const select = document.getElementById("selectFuncionario");
@@ -318,13 +404,11 @@ async function carregarFuncionariosParaSelect() {
                     )
                     .join("");
         } else {
-            select.innerHTML =
-                '<option value="">Nenhum funcionário cadastrado</option>';
+            select.innerHTML = '<option value="">Nenhum funcionário cadastrado</option>';
         }
     } catch (error) {
         console.error("Erro ao carregar funcionários:", error);
-        select.innerHTML =
-            '<option value="">Erro ao carregar funcionários</option>';
+        select.innerHTML = '<option value="">Erro ao carregar funcionários</option>';
     }
 }
 
@@ -332,9 +416,7 @@ function adicionarFuncionarioNaTabela() {
     const select = document.getElementById("selectFuncionario");
     const salarioInput = document.getElementById("funcSalarioDia");
     const cargoSelect = document.getElementById("funcCargo");
-    const tabelaBody = document.querySelector(
-        "#tabela-funcionarios-obra tbody"
-    );
+    const tabelaBody = document.querySelector("#tabela-funcionarios-obra tbody");
 
     if (!select || !salarioInput || !cargoSelect || !tabelaBody) return;
 
@@ -371,13 +453,12 @@ function adicionarFuncionarioNaTabela() {
         tr.remove();
     });
 
-    // limpa campos
     select.value = "";
     salarioInput.value = "";
     cargoSelect.value = "ajudante";
 }
 
-// ---------- Enviar tudo para o back ----------
+// --- Salvar Obra ---
 
 async function salvarObra() {
     const form = document.getElementById("formCadastroObra");
@@ -400,98 +481,56 @@ async function salvarObra() {
         return;
     }
 
-    // monta etapas
     const etapas = [];
     let etapaIncompleta = false;
 
-    document
-        .querySelectorAll("#lista-etapas .etapa-item")
-        .forEach((item) => {
-            const nome = item.querySelector(".etapa-nome").value.trim();
-            const descricao = item.querySelector(".etapa-descricao").value.trim();
-            const prazo = item.querySelector(".etapa-prazo").value;
-            const status = item.querySelector(".etapa-status").value;
-            const valorStr = item.querySelector(".etapa-valor").value;
-            const valor = parseFloat(valorStr);
+    document.querySelectorAll("#lista-etapas .etapa-item").forEach((item) => {
+        const nome = item.querySelector(".etapa-nome").value.trim();
+        const descricao = item.querySelector(".etapa-descricao").value.trim();
+        const prazo = item.querySelector(".etapa-prazo").value;
+        const status = item.querySelector(".etapa-status").value;
+        const valorStr = item.querySelector(".etapa-valor").value;
+        const valor = parseFloat(valorStr);
 
-            // 1) Se NÃO tiver nome:
-            if (!nome) {
-                // se não tem nome mas a pessoa começou a digitar algo em outro campo, é etapa “meio preenchida”
-                if (descricao || prazo || status || valorStr) {
-                    etapaIncompleta = true;
-                }
-                // em qualquer caso, etapa sem nome NÃO entra na lista
-                return;
-            }
+        if (!nome) {
+            if (descricao || prazo || status || valorStr) etapaIncompleta = true;
+            return;
+        }
 
-            // 2) Tem nome → todos os outros campos passam a ser obrigatórios
-            if (!descricao || !prazo || !status || valorStr === "" || isNaN(valor)) {
-                etapaIncompleta = true;
-                return;
-            }
+        if (!descricao || !prazo || !status || valorStr === "" || isNaN(valor)) {
+            etapaIncompleta = true;
+            return;
+        }
 
-            // 3) Etapa válida (completa)
-            etapas.push({
-                nome,
-                descricao,
-                prazo,
-                status,
-                valor,
-            });
-        });
+        etapas.push({ nome, descricao, prazo, status, valor });
+    });
 
-    // Se existe alguma etapa com nome mas faltando coisa:
     if (etapaIncompleta) {
-        alert("Complete todas as informações das etapas que têm nome (descrição, prazo, status e valor).");
+        alert("Complete todas as informações das etapas que têm nome.");
         return;
     }
 
-    // Se nenhuma etapa válida foi montada:
     if (etapas.length === 0) {
-        alert("Cadastre pelo menos uma etapa completa para a obra.");
+        alert("Cadastre pelo menos uma etapa completa.");
         return;
     }
 
-
-if (etapaIncompleta) {
-    alert("Preencha todas as informações de cada etapa que tiver nome (descrição, prazo, status e valor).");
-    return;
-}
-
-if (etapas.length === 0) {
-    alert("Cadastre pelo menos uma etapa completa para a obra.");
-    return;
-}
-
-
-    // monta funcionários na obra
     const funcionarios = [];
-    document
-        .querySelectorAll("#tabela-funcionarios-obra tbody tr")
-        .forEach((tr) => {
-            const idFuncionario = tr.dataset.idFuncionario;
-            const salarioDia = parseFloat(
-                tr.querySelector(".td-salario").textContent || "0"
-            );
-            const cargo = tr.querySelector(".td-cargo").textContent;
+    document.querySelectorAll("#tabela-funcionarios-obra tbody tr").forEach((tr) => {
+        const idFuncionario = tr.dataset.idFuncionario;
+        const salarioDia = parseFloat(tr.querySelector(".td-salario").textContent || "0");
+        const cargo = tr.querySelector(".td-cargo").textContent;
 
-            if (!idFuncionario) return;
-
-            funcionarios.push({
-                idFuncionario,
-                salarioDia,
-                cargo,
-            });
-        });
+        if (idFuncionario) {
+            funcionarios.push({ idFuncionario, salarioDia, cargo });
+        }
+    });
 
     const payload = {
         nome,
         local,
         statusObra,
-        cliente: {
-            nome: clienteNome,
-            contato: clienteContato,
-        },
+        cliente: { nome: clienteNome, contato: clienteContato },
         etapas,
         funcionarios,
     };
@@ -506,16 +545,12 @@ if (etapas.length === 0) {
 
         if (data.deuCerto) {
             alert("Obra cadastrada com sucesso!");
-            // fecha modal
-            const modalElement =
-                document.getElementById("modalObra");
-            if (modalElement) {
-                const modalInstance =
-                    bootstrap.Modal.getInstance(modalElement) ||
-                    new bootstrap.Modal(modalElement);
-                modalInstance.hide();
-            }
-            // recarrega lista de obras
+
+            const modalElement = document.getElementById("modalObra");
+            const modalInstance =
+                bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+            modalInstance.hide();
+
             carregarObras();
         } else {
             alert(data.message || "Erro ao cadastrar obra.");

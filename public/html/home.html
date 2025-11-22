@@ -10,23 +10,20 @@
     <body>
         <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
             <div class="container">
-                <!-- Logo + Texto -->
+
                 <a class="navbar-brand d-flex align-items-center" href="#">
                     <img src="../imgs/logo.png" alt="Logo" width="50" class="me-2">
                     <span>ANS - Construções e Reformas</span>
                 </a>
 
-                <!-- Botão hamburguer para telas pequenas -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" 
-                        aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <!-- Links da navbar + barra de pesquisa -->
                 <div class="collapse navbar-collapse justify-content-center" id="navbarLinks">
                     <ul class="navbar-nav mx-auto mb-2 mb-lg-0 nav_link_azul">
                         <li class="nav-item">
-                            <a class="nav-link active_azul" aria-current="page" href="home.html">Obras</a>
+                            <a class="nav-link active_azul" href="home.html">Obras</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link outros" href="funcionarios.html">Funcionários</a>
@@ -39,20 +36,21 @@
                         </li>
                     </ul>
 
-                    <!-- Barra de pesquisa -->
-                    <form class="d-flex ms-auto mb-0" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
+                    <form class="d-flex ms-auto mb-0" id="formBuscaObras">
+                        <input class="form-control me-2" id="inputBuscaObras" type="search" placeholder="Pesquisar obras">
                         <button class="btn btn_azul" type="submit">Buscar</button>
                     </form>
+                </div>
             </div>
         </nav>
-        
 
         <div class="container mt-4">
+
             <div class="row mt-4">
                 <div class="col">
                     <h2 class="mb-3">Obras</h2>
                 </div>
+
                 <div class="col text-end">
                     <select class="form-select w-auto d-inline-block" id="filtroObras">
                         <option value="todas" selected>Filtrar por Status</option>
@@ -62,72 +60,37 @@
                     </select>
                 </div>
             </div>
-            
 
-            <!-- Botão que abre o modal -->
             <button class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalObra">
                 Inserir Obra
             </button>
 
-            <!-- Mensagem se não houver obras -->
             <div class="alert alert-light border d-none" role="alert">
-                Nenhuma obra cadastrado.
+                Nenhuma obra cadastrada.
             </div>
 
-            <!--Tabela de obras-->
-            <!-- Três obras por linha-->
-            <!--No máximo três linhas -->
             <div class="mt-4">
                 <div id="lista-obras" class="row row-cols-1 row-cols-md-3 g-4">
-                    <!-- Exemplo de obra -->
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-body shadow-lg">
-                                <h5 class="card-title">Nome da Obra</h5>
-                                <p class="card-text"><strong>Local:</strong> Endereço da Obra</p>
-                                <p class="card-text"><strong>Cliente:</strong> Nome do Cliente  | Contato do Cliente</p>  
-                                <p> <strong>Status:</strong> Status da obra</p>  
-                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesObra">Ver Detalhes</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-body shadow-lg">
-                                <h5 class="card-title">Nome da Obra</h5>
-                                <p class="card-text"><strong>Local:</strong> Endereço da Obra</p>
-                                <p class="card-text"><strong>Cliente:</strong> Nome do Cliente  | Contato do Cliente</p>    
-                                <p> <strong>Status:</strong> Status da obra</p>  
-                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesObra">Ver Detalhes</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-body shadow-lg">
-                                <h5 class="card-title">Nome da Obra</h5>
-                                <p class="card-text"><strong>Local:</strong> Endereço da Obra</p>
-                                <p class="card-text"><strong>Cliente:</strong> Nome do Cliente  | Contato do Cliente</p> 
-                                <p> <strong>Status:</strong> Status da obra</p>     
-                                <a class="btn btn_azul" data-bs-toggle="modal" data-bs-target="#modalDetalhesObra">Ver Detalhes</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>    
-
+                </div>
             </div>
+
+            <div id="paginacao-obras" class="mt-4 text-center"></div>
+
         </div>
 
-        <!-- Modal - Inserir Obra -->
-        <div class="modal fade" id="modalObra" tabindex="-1" aria-labelledby="modalObraLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg"> 
+        <!-- Modal Inserir Obra -->
+        <div class="modal fade" id="modalObra" tabindex="-1">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
+
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalObraLabel">Cadastrar Obra</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                        <h5 class="modal-title">Cadastrar Obra</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
+
                     <div class="modal-body">
                         <form id="formCadastroObra">
+
                             <div class="mb-3">
                                 <label class="form-label">Nome da Obra</label>
                                 <input type="text" name="nome" class="form-control" required>
@@ -148,18 +111,22 @@
                             </div>
 
                             <h5>Cliente</h5>
+
                             <div class="mb-3">
                                 <label class="form-label">Nome</label>
                                 <input type="text" name="cliente_nome" class="form-control" required>
                             </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Contato</label>
                                 <input type="text" name="cliente_contato" class="form-control">
                             </div>
 
                             <hr>
-                            <h5>Etapas da obra</h5>
+                            <h5>Etapas da Obra</h5>
+
                             <div id="lista-etapas"></div>
+
                             <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="btnAddEtapa">
                                 Adicionar etapa
                             </button>
@@ -176,19 +143,21 @@
                             </div>
 
                             <hr>
-                            <h5>Funcionários na obra</h5>
+                            <h5>Funcionários</h5>
 
-                            <div class="row g-2 align-items-end">
+                            <div class="row g-2">
                                 <div class="col-md-6">
                                     <label class="form-label">Funcionário</label>
                                     <select id="selectFuncionario" class="form-select">
-                                        <option value="">Carregando funcionários...</option>
+                                        <option value="">Carregando...</option>
                                     </select>
                                 </div>
+
                                 <div class="col-md-3">
-                                    <label class="form-label">Salário por dia na obra</label>
+                                    <label class="form-label">Salário por dia</label>
                                     <input type="number" id="funcSalarioDia" class="form-control" min="0" step="0.01">
                                 </div>
+
                                 <div class="col-md-3">
                                     <label class="form-label">Cargo</label>
                                     <select id="funcCargo" class="form-select">
@@ -196,6 +165,7 @@
                                         <option value="pedreiro">Pedreiro</option>
                                     </select>
                                 </div>
+
                                 <div class="col-12 mt-2">
                                     <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAddFuncionarioObra">
                                         Adicionar funcionário
@@ -203,7 +173,7 @@
                                 </div>
                             </div>
 
-                            <table class="table table-sm mt-3" id="tabela-funcionarios-obra">
+                            <table class="table mt-3" id="tabela-funcionarios-obra">
                                 <thead>
                                     <tr>
                                         <th>Nome</th>
@@ -214,90 +184,88 @@
                                 </thead>
                                 <tbody></tbody>
                             </table>
+
                         </form>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Cancelar</button>
-                        <!-- NÃO envia o form diretamente; vamos tratar via JS -->
-                        <button type="button" class="btn btn_azul" id="btnSalvarObra">Salvar Obra</button>
+                        <button class="btn btn_bege" data-bs-dismiss="modal">Cancelar</button>
+                        <button class="btn btn_azul" id="btnSalvarObra">Salvar Obra</button>
                     </div>
 
                 </div>
             </div>
         </div>
-        
-        <!-- Modal - Detalhes de uma obra REAL -->
-        <div class="modal fade" id="modalDetalhesObra" tabindex="-1" aria-labelledby="modalDetalhesObraLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg"> 
+
+        <!-- Modal Detalhes -->
+        <div class="modal fade" id="modalDetalhesObra" tabindex="-1">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
+
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalDetalhesObraLabel">Detalhes da Obra</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                        <h5 class="modal-title">Detalhes da Obra</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
 
                         <div class="mb-3">
                             <label class="form-label">Nome da Obra</label>
-                            <input type="text" id="detalheNomeObra" class="form-control" readonly>
+                            <input id="detalheNomeObra" class="form-control" readonly>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Local</label>
-                            <input type="text" id="detalheLocalObra" class="form-control" readonly>
+                            <input id="detalheLocalObra" class="form-control" readonly>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Status</label>
-                            <input type="text" id="detalheStatusObra" class="form-control" readonly>
+                            <input id="detalheStatusObra" class="form-control" readonly>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Quantidade de Etapas</label>
-                            <input type="text" id="detalheQtdEtapas" class="form-control" readonly>
+                            <input id="detalheQtdEtapas" class="form-control" readonly>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Valor Total</label>
-                            <input type="text" id="detalheValorObra" class="form-control" readonly>
+                            <input id="detalheValorObra" class="form-control" readonly>
                         </div>
 
                         <h5>Cliente</h5>
 
                         <div class="mb-3">
                             <label class="form-label">Nome</label>
-                            <input type="text" id="detalheClienteNome" class="form-control" readonly>
+                            <input id="detalheClienteNome" class="form-control" readonly>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Contato</label>
-                            <input type="text" id="detalheClienteContato" class="form-control" readonly>
+                            <input id="detalheClienteContato" class="form-control" readonly>
                         </div>
 
                         <hr>
 
-                        <h5>Etapas da obra</h5>
-                        <table class="table table-sm" id="tabelaDetalhesEtapas">
+                        <h5>Etapas da Obra</h5>
+                        <table class="table" id="tabelaDetalhesEtapas">
                             <thead>
                                 <tr>
                                     <th>Nome</th>
                                     <th>Descrição</th>
                                     <th>Prazo</th>
                                     <th>Status</th>
-                                    <th>Valor (R$)</th>
+                                    <th>Valor</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <!-- preenchido via JS -->
-                            </tbody>
+                            <tbody></tbody>
                         </table>
-
 
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Fechar</button>
+                        <button class="btn btn_bege" data-bs-dismiss="modal">Fechar</button>
                     </div>
 
                 </div>
