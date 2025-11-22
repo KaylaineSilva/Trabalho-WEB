@@ -54,11 +54,11 @@
                     <h2 class="mb-3">Obras</h2>
                 </div>
                 <div class="col text-end">
-                    <select class="form-select w-auto d-inline-block">
-                        <option selected>Filtrar por Status</option>
-                        <option value="1">Não inciadas</option>
-                        <option value="2">Em andamento</option>
-                        <option value="3">Concluídas</option>
+                    <select class="form-select w-auto d-inline-block" id="filtroObras">
+                        <option value="todas" selected>Filtrar por Status</option>
+                        <option value="não iniciada">Não iniciadas</option>
+                        <option value="em andamento">Em andamento</option>
+                        <option value="concluída">Concluídas</option>
                     </select>
                 </div>
             </div>
@@ -77,8 +77,8 @@
             <!--Tabela de obras-->
             <!-- Três obras por linha-->
             <!--No máximo três linhas -->
-            <div class="container mt-4 d-flex justify-content-center">
-                <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="mt-4">
+                <div id="lista-obras" class="row row-cols-1 row-cols-md-3 g-4">
                     <!-- Exemplo de obra -->
                     <div class="col">
                         <div class="card h-100">
@@ -127,7 +127,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
                     <div class="modal-body">
-                        <form method="POST">
+                        <form id="formCadastroObra">
                             <div class="mb-3">
                                 <label class="form-label">Nome da Obra</label>
                                 <input type="text" name="nome" class="form-control" required>
@@ -135,7 +135,16 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Local</label>
-                                <input type="text" name="local" class="form-control">
+                                <input type="text" name="local" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Status da Obra</label>
+                                <select name="statusObra" class="form-select">
+                                    <option value="não iniciada">Não iniciada</option>
+                                    <option value="em andamento">Em andamento</option>
+                                    <option value="concluída">Concluída</option>
+                                </select>
                             </div>
 
                             <h5>Cliente</h5>
@@ -147,51 +156,150 @@
                                 <label class="form-label">Contato</label>
                                 <input type="text" name="cliente_contato" class="form-control">
                             </div>
+
+                            <hr>
+                            <h5>Etapas da obra</h5>
+                            <div id="lista-etapas"></div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="btnAddEtapa">
+                                Adicionar etapa
+                            </button>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Quantidade de etapas</label>
+                                    <input type="text" id="qtdEtapasObra" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Valor total da obra</label>
+                                    <input type="text" id="valorTotalObra" class="form-control" readonly>
+                                </div>
+                            </div>
+
+                            <hr>
+                            <h5>Funcionários na obra</h5>
+
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-6">
+                                    <label class="form-label">Funcionário</label>
+                                    <select id="selectFuncionario" class="form-select">
+                                        <option value="">Carregando funcionários...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Salário por dia na obra</label>
+                                    <input type="number" id="funcSalarioDia" class="form-control" min="0" step="0.01">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Cargo</label>
+                                    <select id="funcCargo" class="form-select">
+                                        <option value="ajudante">Ajudante</option>
+                                        <option value="pedreiro">Pedreiro</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAddFuncionarioObra">
+                                        Adicionar funcionário
+                                    </button>
+                                </div>
+                            </div>
+
+                            <table class="table table-sm mt-3" id="tabela-funcionarios-obra">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Salário/dia</th>
+                                        <th>Cargo</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
                         </form>
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn_azul">Salvar Obra</button>
+                        <!-- NÃO envia o form diretamente; vamos tratar via JS -->
+                        <button type="button" class="btn btn_azul" id="btnSalvarObra">Salvar Obra</button>
                     </div>
+
                 </div>
             </div>
         </div>
         
-        <!-- Modal - Detalhes de uma obra-->
+        <!-- Modal - Detalhes de uma obra REAL -->
         <div class="modal fade" id="modalDetalhesObra" tabindex="-1" aria-labelledby="modalDetalhesObraLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg"> 
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalDetalhesObraLabel">Nome da Obra</h5>
+                        <h5 class="modal-title" id="modalDetalhesObraLabel">Detalhes da Obra</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
+
                     <div class="modal-body">
-                        <form method="POST">
-                            <div class="mb-3">
-                                <label class="form-label">Nome da Obra</label>
-                                <input type="text" name="nome" class="form-control" aria-readonly="true" required>
-                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Local</label>
-                                <input type="text" name="local" class="form-control" aria-readonly="true" required>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nome da Obra</label>
+                            <input type="text" id="detalheNomeObra" class="form-control" readonly>
+                        </div>
 
-                            <h5>Cliente</h5>
-                            <div class="mb-3">
-                                <label class="form-label">Nome</label>
-                                <input type="text" name="cliente_nome" class="form-control" aria-readonly="true" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Contato</label>
-                                <input type="text" name="cliente_contato" class="form-control" aria-readonly="true" required>
-                            </div>
-                        </form>
+                        <div class="mb-3">
+                            <label class="form-label">Local</label>
+                            <input type="text" id="detalheLocalObra" class="form-control" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <input type="text" id="detalheStatusObra" class="form-control" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Quantidade de Etapas</label>
+                            <input type="text" id="detalheQtdEtapas" class="form-control" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Valor Total</label>
+                            <input type="text" id="detalheValorObra" class="form-control" readonly>
+                        </div>
+
+                        <h5>Cliente</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nome</label>
+                            <input type="text" id="detalheClienteNome" class="form-control" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Contato</label>
+                            <input type="text" id="detalheClienteContato" class="form-control" readonly>
+                        </div>
+
+                        <hr>
+
+                        <h5>Etapas da obra</h5>
+                        <table class="table table-sm" id="tabelaDetalhesEtapas">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Prazo</th>
+                                    <th>Status</th>
+                                    <th>Valor (R$)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- preenchido via JS -->
+                            </tbody>
+                        </table>
+
+
                     </div>
+
                     <div class="modal-footer">
-                        <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn_azul">Editar Obra</button>
+                        <button type="button" class="btn btn_bege" data-bs-dismiss="modal">Fechar</button>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -199,5 +307,6 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script src="../js/logout.js"></script>
+        <script src="../js/home.js"></script>
     </body>
 </html>
