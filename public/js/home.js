@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ======== CONTROLES DE PAGINAÇÃO  ========
 let obrasPaginadas = [];
 let paginaAtual = 1;
-const itensPorPagina = 6;
+const itensPorPagina = 9;
 
 
 // ================== LISTAR / FILTRAR ==================
@@ -243,10 +243,8 @@ window.abrirDetalhesBack = async function (idObra) {
         document.getElementById("detalheNomeObra").value = obra.nome;
         document.getElementById("detalheLocalObra").value = obra.local;
         document.getElementById("detalheStatusObra").value = obra.status || "-";
-        document.getElementById("detalheQtdEtapas").value =
-            obra.qtdEtapas ?? (obra.Etapas?.length || 0);
-        document.getElementById("detalheValorObra").value =
-            "R$ " + Number(obra.valorTotal ?? 0).toFixed(2).replace(".", ",");
+        document.getElementById("detalheQtdEtapas").value = obra.qtdEtapas ?? (obra.Etapas?.length || 0);
+        document.getElementById("detalheValorObra").value = "R$ " + Number(obra.valorTotal ?? 0).toFixed(2).replace(".", ",");
 
         const cliente = obra.Clientes?.[0] || {};
         document.getElementById("detalheClienteNome").value = cliente.nome || "-";
