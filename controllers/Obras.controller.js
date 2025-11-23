@@ -89,7 +89,7 @@ export async function createObra(req, res) {
     const t = await sequelize.transaction();
 
     try {
-        // 🔎 DEBUG opcional: pra você ver o que vem no token
+        // DEBUG opcional pra ver o que vem no token
         console.log("[debug] req.user em createObra:", req.user);
 
         let idUsuario = null;
@@ -113,7 +113,7 @@ export async function createObra(req, res) {
         }
 
         if (!idUsuario) {
-            // se cair aqui, idUsuario ainda está null → não dá pra criar obra
+            // se cair aqui, idUsuario ainda está null - não dá pra criar obra
             await t.rollback();
             return res.json({
                 deuCerto: false,
@@ -203,14 +203,14 @@ export async function createObra(req, res) {
             const valor = parseFloat(valorStr);
 
             if (!nome) {
-                // sem nome, mas com outros dados -> incompleta
+                // sem nome, mas com outros dados - incompleta
                 if (descricao || prazo || status || valorStr) {
                     etapaIncompleta = true;
                 }
                 continue; // ignora etapas sem nome
             }
 
-            // tem nome -> tudo obrigatório
+            // tem nome - tudo obrigatório
             if (!descricao || !prazo || !status || valorStr === undefined || valorStr === null || isNaN(valor) || valor <= 0) {
                 etapaIncompleta = true;
                 continue;
