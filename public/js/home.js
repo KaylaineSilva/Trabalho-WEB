@@ -306,7 +306,10 @@ function inicializarCadastroObra() {
     carregarFuncionariosParaSelect();
 }
 
-// --- Etapas ---
+// ========================================================
+// ADICIONAR ETAPAS
+// ========================================================
+
 
 function adicionarEtapa() {
     const container = document.getElementById("lista-etapas");
@@ -379,7 +382,10 @@ function recalcularResumoObra() {
     if (valorInput) valorInput.value = "R$ " + total.toFixed(2).replace(".", ",");
 }
 
-// --- Funcionários ---
+// ========================================================
+// ADICIONA FUNCIONÁRIOS
+// ========================================================
+
 
 async function carregarFuncionariosParaSelect() {
     const select = document.getElementById("selectFuncionario");
@@ -456,7 +462,10 @@ function adicionarFuncionarioNaTabela() {
     cargoSelect.value = "ajudante";
 }
 
-// --- Salvar Obra ---
+// ========================================================
+// SALVAR OBRAS
+// ========================================================
+
 
 async function salvarObra() {
     const form = document.getElementById("formCadastroObra");
