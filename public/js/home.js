@@ -5,11 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (filtro) {
         filtro.addEventListener("change", () => {
             const valor = filtro.value;
-            paginaAtual = 1; //faz reset paginação
+            paginaAtual = 1; // reseta a paginação ao mudar o filtro
             if (valor === "todas") {
                 carregarObras();
             } else {
-                filtrarObras(valor);
+                filtrarObras(valor); // filtra por status específico
             }
         });
     }
@@ -17,18 +17,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalObraEl = document.getElementById("modalObra");
     if (modalObraEl) {
         modalObraEl.addEventListener("show.bs.modal", () => {
-            const form = document.getElementById("formCadastroObra");
-            if (form) form.reset();
+            const form = document.getElementById("formCadastroObra");  
+            if (form) form.reset();  // reseta o formulário
 
             const listaEtapas = document.getElementById("lista-etapas");
             if (listaEtapas) {
-                listaEtapas.innerHTML = "";
+                listaEtapas.innerHTML = ""; // limpa etapas e adiciona a primeira etapa vazia
                 if (typeof adicionarEtapa === "function") adicionarEtapa();
             }
 
             const tabelaFunc = document.querySelector("#tabela-funcionarios-obra tbody");
             if (tabelaFunc) tabelaFunc.innerHTML = "";
-
+            // limpa quantidade de etapas e total
             const qtdEtapas = document.getElementById("qtdEtapasObra");
             if (qtdEtapas) qtdEtapas.value = "";
 
@@ -41,9 +41,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ======== CONTROLES DE PAGINAÇÃO  ========
-let obrasPaginadas = [];
-let paginaAtual = 1;
-const itensPorPagina = 9;
+let obrasPaginadas = []; // guarda lista atual de obras
+let paginaAtual = 1;  // em qual página estou
+const itensPorPagina = 9;  // quantos cards mostrar por página
 
 
 // ================== LISTAR / FILTRAR ==================
@@ -82,7 +82,9 @@ async function filtrarObras(status) {
     }
 }
 
-// ================== BUSCA ==================
+// ============================================================
+// BARRA DE BUSCA POR NOME, LOCAL OU CLIENTE
+// ============================================================
 
 document.getElementById("formBuscaObras").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -90,7 +92,7 @@ document.getElementById("formBuscaObras").addEventListener("submit", async (e) =
     const termo = document.getElementById("inputBuscaObras").value.trim();
     const token = localStorage.getItem("authToken");
 
-    if (!termo) {
+    if (!termo) {  //se apagar o texto, recarrega tudo
         carregarObras();
         return;
     }
@@ -113,6 +115,7 @@ document.getElementById("formBuscaObras").addEventListener("submit", async (e) =
 //  PAGINAÇÃO 
 // ========================================================
 
+// seleciona um pedaço da lista baseado na página atual
 function paginar(lista) {
     const inicio = (paginaAtual - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
@@ -125,10 +128,12 @@ function atualizarPaginacao() {
 
     if (!paginacao) return;
 
-    if (totalPaginas <= 1) {
+    if (totalPaginas <= 1) { // se só tem 1 página, não precisa paginar
         paginacao.innerHTML = "";
         return;
     }
+
+    // HTML da paginação
 
     let html = `
         <div class="pagination-container">
@@ -157,7 +162,7 @@ function atualizarPaginacao() {
     paginacao.innerHTML = html;
 }
 
-
+// troca de página
 window.mudarPagina = function (nova) {
     const totalPaginas = Math.ceil(obrasPaginadas.length / itensPorPagina);
 
@@ -173,14 +178,17 @@ window.mudarPagina = function (nova) {
 // ========================================================
 
 function renderizarObras(obras) {
+    // Elemento onde os cards serão inseridos
     const container = document.getElementById("lista-obras");
     if (!container) return;
 
+    // guarda lista completa para paginação
     obrasPaginadas = obras;
     const exibicao = paginar(obrasPaginadas);
 
     container.className = "row row-cols-1 row-cols-md-3 g-4";
 
+    // caso nenhuma obra tenha sido encontrada
     if (!exibicao || exibicao.length === 0) {
         container.innerHTML = `
             <p class="text-center mt-3 w-100">Nenhuma obra encontrada.</p>
@@ -189,6 +197,7 @@ function renderizarObras(obras) {
         return;
     }
 
+    // monta o HTML dos cards
     container.innerHTML = exibicao
         .map(
             (obra) => `
@@ -210,6 +219,8 @@ function renderizarObras(obras) {
             </div>`
         )
         .join("");
+
+    // Atualiza a paginação abaixo da lista
 
     atualizarPaginacao();
 }
@@ -607,8 +618,7 @@ async function salvarObra() {
             alert("Obra cadastrada com sucesso!");
 
             const modalElement = document.getElementById("modalObra");
-            const modalInstance =
-                bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+            const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
             modalInstance.hide();
 
             carregarObras();

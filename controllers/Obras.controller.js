@@ -96,7 +96,7 @@ export async function createObra(req, res) {
     const t = await sequelize.transaction();
 
     try {
-        // DEBUG opcional pra ver o que vem no token
+        // DEBUG pra ver o que vem no token
         console.log("[debug] req.user em createObra:", req.user);
 
         let idUsuario = null;
@@ -108,7 +108,7 @@ export async function createObra(req, res) {
             else if (req.user.sub) idUsuario = req.user.sub;
         }
 
-        // fallback: se no token só tiver o nome, tenta achar no BD
+        //se no token só tiver o nome, tenta achar no BD
         if (!idUsuario && req.user?.nome) {
             const usuario = await Usuario.findOne({
                 where: { nome: req.user.nome },
@@ -120,7 +120,7 @@ export async function createObra(req, res) {
         }
 
         if (!idUsuario) {
-            // se cair aqui, idUsuario ainda está null - não dá pra criar obra
+            // se cair aqui, idUsuario ainda está null, então não dá pra criar obra
             await t.rollback();
             return res.json({
                 deuCerto: false,
@@ -211,14 +211,14 @@ export async function createObra(req, res) {
             const valor = parseFloat(valorStr);
 
             if (!nome) {
-                // sem nome, mas com outros dados - incompleta
+                // sem nome, mas com outros dados 
                 if (descricao || prazo || status || valorStr) {
                     etapaIncompleta = true;
                 }
                 continue; // ignora etapas sem nome
             }
 
-            // tem nome - tudo obrigatório
+            // campos obrigatórios
             if (!descricao || !prazo || !status || valorStr === undefined || valorStr === null || isNaN(valor) || valor <= 0) {
                 etapaIncompleta = true;
                 continue;
@@ -321,7 +321,7 @@ export async function buscarObras(req, res) {
             ]
         });
 
-        // Filtro 
+        //Filtro 
         const filtradas = obras.filter((obra) => {
             const nomeObra = obra.nome?.toLowerCase() || "";
             const localObra = obra.local?.toLowerCase() || "";
