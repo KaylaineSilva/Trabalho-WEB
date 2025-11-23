@@ -36,7 +36,7 @@ Trabalha.init(
 );
 
 /*Relacionamento Many-to-Many entre Funcionarios e Obras através de Trabalha*/
-Funcionarios.belongsToMany(Obras, { through: Trabalha, foreignKey: "idFuncionario", otherKey: "idObra" });
-Obras.belongsToMany(Funcionarios, { through: Trabalha, foreignKey: "idObra", otherKey: "idFuncionario" });
+Funcionarios.belongsToMany(Obras, { through: Trabalha, foreignKey: "idFuncionarios", otherKey: "idObras" });
+Obras.belongsToMany(Funcionarios, { through: Trabalha, foreignKey: "idObras", otherKey: "idFuncionarios" });
 
 export default Trabalha;

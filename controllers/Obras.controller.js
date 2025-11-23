@@ -50,38 +50,45 @@ export async function getObrasPorStatus(req, res) {
 }
 
 // =================== DETALHES DE UMA OBRA ===================
-export async function getObraPorId(req, res) {
+export const getObraPorId = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
 
         const obra = await Obras.findOne({
             where: { idObra: id },
             include: [
                 {
                     model: Clientes,
-                    through: { attributes: [] },
+                    attributes: ["nome", "contato"],
+                    through: { attributes: [] }
                 },
                 {
-                    model: Etapas, // lista de etapas da obra
+                    model: Etapas,
+                    attributes: ["nome", "descricao", "prazo", "status", "valor"]
                 },
                 {
                     model: Funcionarios,
+                    attributes: ["idFuncionario", "nome", "sobrenome"],
                     through: {
-                        model: Trabalha,
-                        attributes: ["salarioDia", "cargo"],
-                    },
-                },
-            ],
+                        attributes: ["salarioDia", "cargo"]
+                    }
+                }
+            ]
         });
 
-        if (!obra) return res.json({ deuCerto: false });
+        if (!obra) {
+            return res.json({ deuCerto: false, message: "Obra não encontrada" });
+        }
 
         return res.json({ deuCerto: true, obra });
-    } catch (erro) {
-        console.error("Erro ao buscar obra:", erro);
-        return res.json({ deuCerto: false });
+
+    } catch (error) {
+        console.error("Erro ao buscar obra:", error);
+        return res.json({ deuCerto: false, message: "Erro no servidor" });
     }
-}
+};
+
+
 
 // =================== CRIAR OBRA COMPLETA ===================
 
@@ -129,6 +136,7 @@ export async function createObra(req, res) {
             etapas = [],
             funcionarios = [],
         } = req.body;
+
 
         if (!nome || !local) {
             await t.rollback();

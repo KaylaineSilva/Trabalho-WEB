@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (filtro) {
         filtro.addEventListener("change", () => {
             const valor = filtro.value;
-            paginaAtual = 1; // reset paginação
+            paginaAtual = 1; //faz reset paginação
             if (valor === "todas") {
                 carregarObras();
             } else {
@@ -228,41 +228,63 @@ function formatarPrazo(prazo) {
     return prazo;
 }
 
+// ========================================================
+//  EXIBIR DETALHES DA OBRA        
+// ========================================================
+
 window.abrirDetalhesBack = async function (idObra) {
+
     const token = localStorage.getItem("authToken");
 
     try {
+        //devolve obra, etapas, cliente e funcionários
         const { data } = await axios.get(`/admin/obras/${idObra}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
 
+        // Se o backend retornou erro
         if (!data.deuCerto) return;
 
+        //Objeto da obra retornado pelo back
         const obra = data.obra;
 
+        //preenche os campos principais no modal
         document.getElementById("detalheNomeObra").value = obra.nome;
         document.getElementById("detalheLocalObra").value = obra.local;
         document.getElementById("detalheStatusObra").value = obra.status || "-";
         document.getElementById("detalheQtdEtapas").value = obra.qtdEtapas ?? (obra.Etapas?.length || 0);
-        document.getElementById("detalheValorObra").value = "R$ " + Number(obra.valorTotal ?? 0).toFixed(2).replace(".", ",");
 
-        const cliente = obra.Clientes?.[0] || {};
+        // Formata valor total
+        const valorTotalFmt = "R$ " + Number(obra.valorTotal ?? 0).toFixed(2).replace(".", ",");
+
+        document.getElementById("detalheValorObra").value = valorTotalFmt;
+
+        //preenche dados do cliente
+        const cliente = obra.Clientes?.[0] || {}; // caso não exista cliente
         document.getElementById("detalheClienteNome").value = cliente.nome || "-";
         document.getElementById("detalheClienteContato").value = cliente.contato || "-";
 
+        //lista etapas na tabela do modal
         const corpoEtapas = document.querySelector("#tabelaDetalhesEtapas tbody");
-        corpoEtapas.innerHTML = "";
+        corpoEtapas.innerHTML = ""; 
 
         const etapas = obra.Etapas || [];
 
         if (etapas.length === 0) {
+            //Caso não existam etapas exibe a mensagem
             const tr = document.createElement("tr");
-            tr.innerHTML = `<td colspan="5" class="text-center">Nenhuma etapa cadastrada.</td>`;
+            tr.innerHTML =
+                `<td colspan="5" class="text-center">Nenhuma etapa cadastrada.</td>`;
             corpoEtapas.appendChild(tr);
         } else {
             etapas.forEach((etapa) => {
                 const tr = document.createElement("tr");
-                const valor = Number(etapa.valor ?? 0);
+
+                //Formata valor e data
+                const valor = Number(etapa.valor ?? 0)
+                    .toFixed(2)
+                    .replace(".", ",");
+
                 const prazoFmt = formatarPrazo(etapa.prazo);
 
                 tr.innerHTML = `
@@ -270,16 +292,47 @@ window.abrirDetalhesBack = async function (idObra) {
                     <td>${etapa.descricao || "-"}</td>
                     <td>${prazoFmt || "-"}</td>
                     <td>${etapa.status || "-"}</td>
-                    <td>R$ ${valor.toFixed(2).replace(".", ",")}</td>
+                    <td>R$ ${valor}</td>
                 `;
                 corpoEtapas.appendChild(tr);
             });
         }
 
+        //lista funcionarios que estão atribuidos a obra
+        const corpoFunc = document.querySelector("#tabelaDetalhesFuncionarios tbody");
+        corpoFunc.innerHTML = ""; // limpar tabela
+
+        const funcionarios = obra.Funcionarios || [];
+
+        if (funcionarios.length === 0) {
+            const tr = document.createElement("tr");
+            tr.innerHTML =
+                `<td colspan="3" class="text-center">Nenhum funcionário atribuído.</td>`;
+            corpoFunc.appendChild(tr);
+        } else {
+            funcionarios.forEach((f) => {
+                const tr = document.createElement("tr");
+
+                const nomeCompleto = `${f.nome} ${f.sobrenome}`;
+                const cargo = f.Trabalha?.cargo || "-";
+                const salarioFmt = Number(f.Trabalha?.salarioDia || 0)
+                    .toFixed(2)
+                    .replace(".", ",");
+
+                tr.innerHTML = `
+                    <td>${nomeCompleto}</td>
+                    <td>${cargo}</td>
+                    <td>R$ ${salarioFmt}</td>
+                `;
+                corpoFunc.appendChild(tr);
+            });
+        }
+
     } catch (error) {
-        console.error("Erro ao carregar detalhes:", error);
+        console.error("Erro ao carregar detalhes da obra:", error);
     }
 };
+
 
 // ========================================================
 // CADASTRO DE OBRAS 
